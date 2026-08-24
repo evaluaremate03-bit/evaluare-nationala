@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluare Națională — Teste de matematică</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --board:#16281F;
+  --board-light:#20392C;
+  --chalk:#F4F1E4;
+  --paper:#FBF9F1;
+  --pen:#C0392B;
+  --pen-dark:#96271C;
+  --grade4:#3D6BB3;
+  --grade4-light:#EAF1FB;
+  --grade8:#B3812F;
+  --grade8-light:#FBF3E3;
+  --ink:#16281F;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',sans-serif;
+  line-height:1.5;
+}
+h1,h2,h3{ font-family:'Fraunces',serif; margin:0; }
+.mono{ font-family:'IBM Plex Mono',monospace; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; border:none; }
+input,textarea,select{ font-family:inherit; }
+
+/* ---------- layout helpers ---------- */
+.page{ min-height:100vh; display:flex; flex-direction:column; }
+.wrap{ max-width:920px; margin:0 auto; padding:0 20px; width:100%; }
+.center{ text-align:center; }
+.card{ background:#fff; border-radius:16px; border:1px solid rgba(22,40,31,0.08); padding:24px; }
+.btn{
+  display:inline-block; border-radius:10px; padding:12px 22px; font-weight:600;
+  transition:transform .15s ease, opacity .15s ease;
+}
+.btn:active{ transform:scale(0.98); }
+.btn-dark{ background:var(--board); color:var(--chalk); }
+.btn-dark:hover{ background:var(--board-light); }
+.btn-pen{ background:var(--pen); color:#fff; }
+.btn-pen:hover{ background:var(--pen-dark); }
+.btn-ghost{ background:transparent; border:1px solid rgba(22,40,31,0.2); color:var(--ink); }
+.field{ width:100%; border:1px solid rgba(22,40,31,0.2); border-radius:8px; padding:10px 12px; font-size:15px; }
+.label{ display:block; font-size:13px; font-weight:600; color:rgba(22,40,31,0.6); margin-bottom:6px; }
+.stamp{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:56px; height:56px; border-radius:50%; border:3px solid var(--pen);
+  color:var(--pen); font-family:'Fraunces',serif; font-weight:700; font-size:20px;
+  transform:rotate(-8deg);
+}
+.badge{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+.hidden{ display:none !important; }
+.muted{ opacity:.6; }
+.hr{ height:1px; background:rgba(22,40,31,0.08); margin:24px 0; border:none; }
+.loading{ text-align:center; padding:60px 20px; color:rgba(244,241,228,0.6); font-family:'IBM Plex Mono',monospace; }
+
+/* ---------- header ---------- */
+.site-header{
+  padding:24px 0 12px; display:flex; align-items:center; justify-content:space-between;
+}
+.brand{ font-family:'Fraunces',serif; font-size:20px; color:var(--chalk); }
+.brand .accent{ color:var(--pen); }
+.nav a{ color:rgba(244,241,228,0.8); font-size:14px; margin-left:20px; }
+.nav a:hover{ color:var(--chalk); }
+
+/* ---------- hero ---------- */
+.hero{
+  background:var(--board);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(244,241,228,0.05) 0, transparent 40%),
+    radial-gradient(circle at 85% 60%, rgba(244,241,228,0.04) 0, transparent 45%);
+  padding-bottom:64px;
+}
+.hero h1{ color:var(--chalk); font-size:clamp(28px,5vw,52px); font-weight:600; line-height:1.15; max-width:680px; margin:20px auto 0; }
+.hero p{ color:rgba(244,241,228,0.7); max-width:520px; margin:16px auto 0; font-size:17px; }
+.hero .price-note{ color:rgba(244,241,228,0.5); font-size:14px; margin-top:6px; }
+.grade-grid{ display:grid; gap:20px; grid-template-columns:1fr; max-width:760px; margin:44px auto 0; }
+@media(min-width:640px){ .grade-grid{ grid-template-columns:1fr 1fr; } }
+.grade-card{ border-radius:16px; padding:28px; text-align:left; transition:transform .2s ease; }
+.grade-card:hover{ transform:translateY(-3px); }
+.grade-card.g4{ background:var(--grade4-light); }
+.grade-card.g8{ background:var(--grade8-light); }
+.grade-card h2{ font-size:26px; margin-top:8px; }
+.grade-card p{ font-size:14px; opacity:.7; margin-top:10px; }
+.grade-card .go{ display:inline-block; margin-top:18px; font-weight:600; }
+
+/* ---------- how it works ---------- */
+.steps{ background:var(--paper); padding:60px 0; }
+.steps h2{ text-align:center; font-size:28px; }
+.steps>.wrap>p{ text-align:center; opacity:.6; margin-top:8px; margin-bottom:40px; }
+.step-grid{ display:grid; gap:20px; grid-template-columns:1fr; }
+@media(min-width:640px){ .step-grid{ grid-template-columns:1fr 1fr 1fr; } }
+.step-num{ color:var(--pen); font-weight:700; font-size:13px; letter-spacing:.08em; }
+.step h3{ font-size:17px; margin-top:8px; }
+.step p{ font-size:14px; opacity:.65; margin-top:8px; }
+
+/* ---------- correction section ---------- */
+.correction{ background:var(--board); padding:60px 0; border-top:1px solid rgba(244,241,228,0.1); }
+.correction .inner{ max-width:520px; margin:0 auto; text-align:center; }
+.correction h2{ color:var(--chalk); font-size:24px; margin-top:16px; }
+.correction p{ color:rgba(244,241,228,0.7); margin-top:14px; }
+.correction a.email{ display:inline-block; margin-top:18px; color:var(--pen); border-bottom:2px solid var(--pen); font-family:'IBM Plex Mono',monospace; padding-bottom:2px; }
+.correction a.email:hover{ color:var(--chalk); border-color:var(--chalk); }
+
+footer{ text-align:center; padding:24px; font-size:12px; color:rgba(244,241,228,0.4); background:var(--board); font-family:'IBM Plex Mono',monospace; }
+
+/* ---------- grade listing pages ---------- */
+.listing-header{ padding:32px 0; display:flex; align-items:center; justify-content:space-between; }
+.listing-header .back{ font-size:14px; font-weight:600; }
+.test-row{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:20px; margin-bottom:12px; border-radius:12px; background:#fff;
+  border:1px solid rgba(22,40,31,0.06); transition:transform .15s ease;
+}
+.test-row:hover{ transform:translateY(-2px); }
+.test-row h3{ font-size:18px; }
+.test-row p{ font-size:13px; opacity:.6; margin-top:4px; }
+.test-price{ font-family:'IBM Plex Mono',monospace; font-weight:700; white-space:nowrap; }
+
+/* ---------- test detail ---------- */
+.test-detail{ padding:32px 0 60px; max-width:640px; margin:0 auto; }
+.unlock-check{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.unlock-check input{ flex:1; min-width:200px; }
+.payment-box{ background:var(--paper); border:1px dashed rgba(22,40,31,0.25); border-radius:12px; padding:18px; margin-top:18px; }
+.request-confirmation{ background:#EFF7EF; border:1px solid #cfe6cf; border-radius:12px; padding:16px; margin-top:16px; font-size:14px; }
+
+/* ---------- admin ---------- */
+.admin-login{ max-width:360px; margin:80px auto; }
+.admin-wrap{ padding:32px 0 80px; max-width:760px; margin:0 auto; }
+.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+.tab-btn{ background:#fff; border:1px solid rgba(22,40,31,0.15); border-radius:999px; padding:8px 16px; font-size:13px; font-weight:600; }
+.tab-btn.active{ background:var(--board); color:var(--chalk); border-color:var(--board); }
+.admin-test-item{ border:1px solid rgba(22,40,31,0.1); border-radius:12px; padding:16px; margin-bottom:14px; background:#fff; }
+.admin-test-item .row2{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; align-items:center; }
+.small{ font-size:13px; }
+.pending-item{ border-left:4px solid var(--pen); background:#fff; border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+.pending-item.confirmed{ border-left-color:#4a9b4a; opacity:.7; }
+.pending-item.rejected{ border-left-color:#999; opacity:.5; }
+.toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--board); color:var(--chalk); padding:10px 20px; border-radius:999px; font-size:13px; z-index:50; }
+</style>
+</head>
+<body>
+
+<div id="app"><div class="loading">Se încarcă site-ul...</div></div>
+
+<script>
+(function(){
+
+"use strict";
+
+/* ================= STORAGE HELPERS ================= */
+const K = {
+  settings: 'site:settings',
+  tests: 'site:tests',
+  requests: 'site:requests',
+  unlocks: 'site:unlocks'
+};
+
+const DEFAULT_SETTINGS = {
+  motto: "De la „nu știu” la 10 — pas cu pas.",
+  tagline: "Teste reale de Evaluare Națională, corectate personal, cu feedback clar.",
+  correctionEmail: "adresa-ta@exemplu.ro",
+  correctionNote: "După ce rezolvi testul, trimite-l pe email la adresa de mai jos. Îl corectez personal și îți trimit înapoi feedback clar, cu explicații pentru fiecare greșeală.",
+  paymentMethod: "Revolut",
+  paymentHandle: "@numele-tau-revolut sau IBAN RO00 XXXX ...",
+  paymentInstructions: "Trimite 15 lei cu titlul „Nume test + clasa”, apoi completează formularul de mai jos ca să știu cine a plătit.",
+  adminPassword: ""
+};
+
+let settings = null;
+let tests = [];
+let requests = [];
+let unlocks = {};
+
+async function loadAll(){
+  settings = await getOrInit(K.settings, DEFAULT_SETTINGS);
+  tests = await getOrInit(K.tests, []);
+  requests = await getOrInit(K.requests, []);
+  unlocks = await getOrInit(K.unlocks, {});
+}
+
+async function getOrInit(key, fallback){
+  try{
+    const res = await window.storage.get(key, true);
+    if(res && res.value) return JSON.parse(res.value);
+    await window.storage.set(key, JSON.stringify(fallback), true);
+    return fallback;
+  }catch(e){
+    try{ await window.storage.set(key, JSON.stringify(fallback), true); }catch(e2){}
+    return fallback;
+  }
+}
+
+async function saveSettings(){ await window.storage.set(K.settings, JSON.stringify(settings), true); }
+async function saveTests(){ await window.storage.set(K.tests, JSON.stringify(tests), true); }
+async function saveRequests(){ await window.storage.set(K.requests, JSON.stringify(requests), true); }
+async function saveUnlocks(){ await window.storage.set(K.unlocks, JSON.stringify(unlocks), true); }
+
+async function getTestContent(id){
+  try{
+    const res = await window.storage.get('test-content:'+id, true);
+    if(res && res.value) return JSON.parse(res.value);
+  }catch(e){}
+  return null;
+}
+async function setTestContent(id, contentType, contentValue){
+  await window.storage.set('test-content:'+id, JSON.stringify({contentType, contentValue}), true);
+}
+async function deleteTestContent(id){
+  try{ await window.storage.delete('test-content:'+id, true); }catch(e){}
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function esc(str){ const d=document.createElement('div'); d.innerText = str==null?'':str; return d.innerHTML; }
+
+/* ================= TOAST ================= */
+function toast(msg){
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerText = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 2400);
+}
+
+/* ================= ADMIN AUTH (in-memory only) ================= */
+let adminAuthed = false;
+
+/* ================= ROUTER ================= */
+window.addEventListener('hashchange', render);
+
+document.addEventListener('click', function(e){
+  const a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+  if(!a) return;
+  e.preventDefault();
+  const hash = a.getAttribute('href');
+  try{
+    if(location.hash !== hash) location.hash = hash;
+  }catch(err){}
+  render();
+});
+
+function currentRoute(){
+  const h = location.hash.replace(/^#\/?/, '');
+  const parts = h.split('/').filter(Boolean);
+  return parts;
+}
+
+async function render(){
+  const app = document.getElementById('app');
+  const parts = currentRoute();
+
+  if(parts.length === 0){ app.innerHTML = renderHome(); attachHomeEvents(); return; }
+  if(parts[0] === 'clasa' && (parts[1]==='4' || parts[1]==='8')){ app.innerHTML = renderGrade(Number(parts[1])); attachGradeEvents(); return; }
+  if(parts[0] === 'test' && parts[1]){ app.innerHTML = renderTest(parts[1]); attachTestEvents(parts[1]); return; }
+  if(parts[0] === 'admin'){ app.innerHTML = renderAdmin(); attachAdminEvents(); return; }
+
+  app.innerHTML = renderHome(); attachHomeEvents();
+}
+
+/* ================= HOME ================= */
+function renderHome(){
+  return `
+  <div class="page">
+    <div class="hero">
+      <div class="wrap">
+        <div class="site-header">
+          <div class="brand">Evaluare<span class="accent">Națională</span>.ro</div>
+          <div class="nav"><a href="#/admin">Admin</a></div>
+        </div>
+        <div class="center">
+          <div class="stamp">10</div>
+          <h1>${esc(settings.motto)}</h1>
+          <p>${esc(settings.tagline)}</p>
+          <p class="price-note">Alege clasa pentru care te pregătești. Fiecare test are prețul afișat pe pagina lui.</p>
+        </div>
+        <div class="grade-grid">
+          <a href="#/clasa/4" class="grade-card g4">
+            <span class="badge" style="color:var(--grade4)">Clasa a IV-a</span>
+            <h2>Evaluare Națională IV</h2>
+            <p>Teste de matematică adaptate programei pentru finalul ciclului primar.</p>
+            <span class="go" style="color:var(--grade4)">Vezi testele →</span>
+          </a>
+          <a href="#/clasa/8" class="grade-card g8">
+            <span class="badge" style="color:var(--grade8)">Clasa a VIII-a</span>
+            <h2>Evaluare Națională VIII</h2>
+            <p>Teste de matematică după modelul examenului de final de gimnaziu.</p>
+            <span class="go" style="color:var(--grade8)">Vezi testele →</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="wrap">
+        <h2>Cum funcționează</h2>
+        <p>Nu primești doar un test — primești și corectură personală.</p>
+        <div class="step-grid">
+          <div class="step card"><div class="step-num">01</div><h3>Alegi testul</h3><p>Alegi clasa și testul potrivit și vezi instrucțiunile de plată direct pe pagina testului.</p></div>
+          <div class="step card"><div class="step-num">02</div><h3>Plătești și confirmi</h3><p>Plătești suma afișată, apoi completezi formularul cu emailul tău ca să știu cine a plătit.</p></div>
+          <div class="step card"><div class="step-num">03</div><h3>Primești acces și corectură</h3><p>Îți confirm accesul, rezolvi testul, îl trimiți pe email și primești corectură cu feedback clar.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="correction">
+      <div class="wrap inner">
+        <div class="stamp" style="width:44px;height:44px;font-size:14px;">✓</div>
+        <h2>Fiecare test este corectat, cu feedback</h2>
+        <p>${esc(settings.correctionNote)}</p>
+        <a class="email mono" href="mailto:${esc(settings.correctionEmail)}">${esc(settings.correctionEmail)}</a>
+      </div>
+    </div>
+
+    <footer>
+      © ${new Date().getFullYear()} EvaluareNațională.ro · <a href="#/admin" style="opacity:.7">admin</a>
+    </footer>
+  </div>`;
+}
+function attachHomeEvents(){}
+
+/* ================= GRADE LISTING ================= */
+function renderGrade(grade){
+  const color = grade===4 ? 'grade4' : 'grade8';
+  const list = tests.filter(t => t.grade===grade && t.published !== false);
+  return `
+  <div class="page" style="background:var(--${color}-light); flex:1;">
+    <div class="wrap">
+      <div class="listing-header">
+        <a href="#/" class="back" style="color:var(--${color})">← Înapoi</a>
+        <span class="badge" style="color:var(--${color})">Clasa a ${grade===4?'IV':'VIII'}-a</span>
+        <a href="#/admin" class="small" style="color:var(--${color}); opacity:.7;">Admin</a>
+      </div>
+      <h1 style="font-size:32px;">Teste — Evaluare Națională ${grade===4?'IV':'VIII'}</h1>
+      <p class="muted" style="margin-top:6px; margin-bottom:32px;">${list.length} teste disponibile</p>
+      ${list.length===0 ? `<p class="muted" style="font-style:italic;">Momentan nu sunt teste publicate pentru această clasă.</p>` : ''}
+      ${list.map(t => `
+        <a href="#/test/${t.id}" class="test-row">
+          <div>
+            <h3>${esc(t.title)}</h3>
+            ${t.description ? `<p>${esc(t.description)}</p>` : ''}
+          </div>
+          <span class="test-price" style="color:var(--${color})">${esc(t.price)} lei</span>
+        </a>
+      `).join('')}
+    </div>
+  </div>`;
+}
+function attachGradeEvents(){}
+
+/* ================= TEST DETAIL ================= */
+function renderTest(id){
+  const t = tests.find(x => x.id === id);
+  if(!t){
+    return `<div class="page center" style="justify-content:center;"><p class="muted">Testul nu a fost găsit. <a href="#/" style="color:var(--pen);">Înapoi acasă</a></p></div>`;
+  }
+  const color = t.grade===4 ? 'grade4' : 'grade8';
+  return `
+  <div class="page">
+    <div class="wrap test-detail">
+      <a href="#/clasa/${t.grade}" class="back mono" style="color:var(--${color}); font-size:14px;">← Toate testele — clasa a ${t.grade===4?'IV':'VIII'}-a</a>
+      <a href="#/admin" class="mono" style="float:right; font-size:13px; color:var(--${color}); opacity:.7;">Admin</a>
+      <h1 style="margin-top:14px; font-size:30px;">${esc(t.title)}</h1>
+      ${t.description ? `<p class="muted" style="margin-top:10px;">${esc(t.description)}</p>` : ''}
+
+      <div class="card" style="margin-top:24px;" id="test-body">
+        ${renderTestBody(t)}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTestBody(t){
+  return `
+    <div id="unlock-check">
+      <p class="label">Ai plătit deja acest test? Verifică accesul:</p>
+      <div class="unlock-check">
+        <input type="email" class="field" id="check-email" placeholder="emailul folosit la plată">
+        <button class="btn btn-ghost" id="btn-check-access">Verifică acces</button>
+      </div>
+    </div>
+    <div id="test-content-area" style="margin-top:20px;"></div>
+  `;
+}
+
+async function renderUnlockedContent(t){
+  const c = await getTestContent(t.id);
+  let body = '';
+  if(c && c.contentType === 'link' && c.contentValue){
+    body = `<a href="${esc(c.contentValue)}" target="_blank" rel="noreferrer" class="btn btn-dark">Deschide testul</a>`;
+  } else if(c && c.contentType === 'text' && c.contentValue){
+    body = `<div style="white-space:pre-wrap; margin-top:6px; line-height:1.7;">${esc(c.contentValue)}</div>`;
+  } else {
+    body = `<p class="muted">Materialul nu a fost încă adăugat de administrator.</p>`;
+  }
+  return `
+    <p style="color:#3a7d3a; font-weight:600;">✓ Test deblocat</p>
+    ${body}
+    <hr class="hr">
+    <p style="font-weight:600;">Vrei corectură și feedback?</p>
+    <p class="muted small">${esc(settings.correctionNote)}</p>
+    <a class="mono" style="color:var(--pen); border-bottom:2px solid var(--pen); display:inline-block; margin-top:6px;"
+       href="mailto:${esc(settings.correctionEmail)}?subject=${encodeURIComponent('Test rezolvat: '+t.title)}">${esc(settings.correctionEmail)}</a>
+  `;
+}
+
+function renderLockedContent(t){
+  return `
+    <p class="label" style="margin-top:4px;">Preț test</p>
+    <p class="mono" style="font-size:26px; font-weight:700;">${esc(t.price)} lei</p>
+
+    <div class="payment-box">
+      <p style="font-weight:600; margin:0 0 6px;">Cum plătești</p>
+      <p class="small muted" style="margin:0;">Metodă: <strong>${esc(settings.paymentMethod)}</strong> — ${esc(settings.paymentHandle)}</p>
+      <p class="small muted" style="margin-top:8px;">${esc(settings.paymentInstructions)}</p>
+    </div>
+
+    <form id="purchase-form" style="margin-top:18px;">
+      <label class="label">Emailul tău (folosit și pentru verificarea accesului)</label>
+      <input required type="email" class="field" id="pf-email" placeholder="nume@exemplu.ro">
+      <label class="label" style="margin-top:12px;">Nume (opțional)</label>
+      <input type="text" class="field" id="pf-name" placeholder="Prenume Nume">
+      <label class="label" style="margin-top:12px;">Notă (opțional — ex: ora la care ai plătit)</label>
+      <textarea class="field" id="pf-note" rows="2" placeholder="Am plătit azi la ora 14:00"></textarea>
+      <button type="submit" class="btn btn-pen" style="margin-top:14px; width:100%;">Am plătit — trimite cererea de deblocare</button>
+    </form>
+    <div id="purchase-confirmation"></div>
+  `;
+}
+
+function attachTestEvents(id){
+  const t = tests.find(x => x.id === id);
+  if(!t) return;
+
+  document.getElementById('btn-check-access').addEventListener('click', async ()=>{
+    const email = document.getElementById('check-email').value.trim().toLowerCase();
+    if(!email){ toast('Introdu emailul folosit la plată.'); return; }
+    const key = email+'::'+t.id;
+    const area = document.getElementById('test-content-area');
+    if(unlocks[key]){
+      area.innerHTML = '<p class="muted small">Se încarcă testul...</p>';
+      area.innerHTML = await renderUnlockedContent(t);
+    } else {
+      area.innerHTML = renderLockedContent(t);
+      const form = document.getElementById('purchase-form');
+      document.getElementById('pf-email').value = email;
+      attachPurchaseForm(form, t);
+      toast('Acces neconfirmat încă — poți trimite mai jos cererea de deblocare.');
+    }
+  });
+
+  // show locked-by-default content area immediately too, so first-time visitors see payment info
+  const area = document.getElementById('test-content-area');
+  area.innerHTML = renderLockedContent(t);
+  const form = document.getElementById('purchase-form');
+  attachPurchaseForm(form, t);
+}
+
+function attachPurchaseForm(form, t){
+  if(!form) return;
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const email = document.getElementById('pf-email').value.trim().toLowerCase();
+    const name = document.getElementById('pf-name').value.trim();
+    const note = document.getElementById('pf-note').value.trim();
+    if(!email){ toast('Emailul este obligatoriu.'); return; }
+
+    requests.push({
+      id: uid(),
+      testId: t.id,
+      testTitle: t.title,
+      email, name, note,
+      createdAt: new Date().toISOString(),
+      status: 'pending'
+    });
+    await saveRequests();
+
+    document.getElementById('purchase-confirmation').innerHTML = `
+      <div class="request-confirmation">
+        Cererea a fost trimisă. După ce confirm plata, revino pe această pagină și
+        apasă „Verifică acces” cu același email (${esc(email)}) pentru a debloca testul.
+      </div>`;
+    form.querySelector('button').innerText = 'Cerere trimisă ✓';
+    form.querySelector('button').disabled = true;
+  });
+}
+
+/* ================= ADMIN ================= */
+let adminTab = 'settings';
+
+function renderAdmin(){
+  if(!adminAuthed){
+    return `
+    <div class="page" style="background:var(--paper);">
+      <div class="wrap admin-login">
+        <h1 style="font-size:24px;">Admin</h1>
+        <p class="muted small" style="margin-top:8px;">
+          Acces simplu, cu parolă — util ca filtru de bază, nu ca securitate reală
+          (oricine cunoaște parola poate edita site-ul).
+        </p>
+        <form id="admin-login-form" style="margin-top:20px;">
+          <label class="label">Parolă admin</label>
+          <input type="password" class="field" id="admin-pass" required>
+          <button class="btn btn-dark" style="margin-top:14px; width:100%;" type="submit">Intră</button>
+        </form>
+        <p style="margin-top:20px;"><a href="#/" class="small muted">← Înapoi la site</a></p>
+      </div>
+    </div>`;
+  }
+
+  const pending = requests.filter(r=>r.status==='pending');
+
+  return `
+  <div class="page" style="background:var(--paper);">
+    <div class="wrap admin-wrap">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <h1 style="font-size:26px;">Panou de administrare</h1>
+        <a href="#/" class="small muted">← Vezi site-ul</a>
+      </div>
+
+      <div class="tabs" style="margin-top:20px;">
+        <button class="tab-btn ${adminTab==='settings'?'active':''}" data-tab="settings">Textele site-ului</button>
+        <button class="tab-btn ${adminTab==='tests'?'active':''}" data-tab="tests">Teste</button>
+        <button class="tab-btn ${adminTab==='requests'?'active':''}" data-tab="requests">Cereri de plată ${pending.length?`(${pending.length})`:''}</button>
+      </div>
+
+      <div id="admin-tab-content">${renderAdminTab()}</div>
+    </div>
+  </div>`;
+}
+
+function renderAdminTab(){
+  if(adminTab==='settings') return renderAdminSettings();
+  if(adminTab==='tests') return renderAdminTests();
+  if(adminTab==='requests') return renderAdminRequests();
+  return '';
+}
+
+function renderAdminSettings(){
+  const s = settings;
+  return `
+  <div class="card">
+    <h3 style="font-size:16px; margin-bottom:14px;">Motto și texte</h3>
+    <label class="label">Motto (titlul mare de pe prima pagină)</label>
+    <input class="field" id="s-motto" value="${esc(s.motto)}">
+    <label class="label" style="margin-top:12px;">Tagline</label>
+    <input class="field" id="s-tagline" value="${esc(s.tagline)}">
+    <label class="label" style="margin-top:12px;">Email de corectură</label>
+    <input class="field" id="s-email" value="${esc(s.correctionEmail)}">
+    <label class="label" style="margin-top:12px;">Mesaj despre corectură</label>
+    <textarea class="field" id="s-note" rows="3">${esc(s.correctionNote)}</textarea>
+
+    <hr class="hr">
+    <h3 style="font-size:16px; margin-bottom:14px;">Plată</h3>
+    <label class="label">Metodă de plată</label>
+    <input class="field" id="s-pmethod" value="${esc(s.paymentMethod)}">
+    <label class="label" style="margin-top:12px;">Detalii cont (Revolut / IBAN)</label>
+    <input class="field" id="s-phandle" value="${esc(s.paymentHandle)}">
+    <label class="label" style="margin-top:12px;">Instrucțiuni afișate elevului</label>
+    <textarea class="field" id="s-pinstr" rows="2">${esc(s.paymentInstructions)}</textarea>
+
+    <hr class="hr">
+    <h3 style="font-size:16px; margin-bottom:14px;">Parolă admin</h3>
+    <input class="field" id="s-pass" type="text" value="${esc(s.adminPassword)}">
+    <p class="small muted" style="margin-top:6px;">Schimb-o cu ceva greu de ghicit — e singura protecție a acestui panou.</p>
+
+    <button class="btn btn-dark" id="save-settings" style="margin-top:18px;">Salvează textele</button>
+  </div>`;
+}
+
+function renderAdminTests(){
+  return `
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="font-size:16px; margin-bottom:14px;">Adaugă test nou</h3>
+      <label class="label">Clasă</label>
+      <select class="field" id="nt-grade">
+        <option value="4">Clasa a IV-a</option>
+        <option value="8">Clasa a VIII-a</option>
+      </select>
+      <label class="label" style="margin-top:12px;">Titlu</label>
+      <input class="field" id="nt-title" placeholder="Ex: Test 1 — Numere naturale">
+      <label class="label" style="margin-top:12px;">Descriere scurtă</label>
+      <input class="field" id="nt-desc" placeholder="Ex: Operații cu numere naturale">
+      <label class="label" style="margin-top:12px;">Preț (lei)</label>
+      <input class="field" id="nt-price" type="number" min="0" step="0.01" value="15">
+      <label class="label" style="margin-top:12px;">Format</label>
+      <select class="field" id="nt-type">
+        <option value="text">Scris direct (text)</option>
+        <option value="link">Link extern (ex: PDF pe Google Drive)</option>
+      </select>
+      <label class="label" style="margin-top:12px;">Conținut / link</label>
+      <textarea class="field" id="nt-content" rows="4" placeholder="Textul testului, sau linkul către PDF"></textarea>
+      <button class="btn btn-pen" id="add-test" style="margin-top:14px;">Publică testul</button>
+    </div>
+
+    <h3 style="font-size:16px; margin-bottom:14px;">Teste existente (${tests.length})</h3>
+    ${tests.length===0 ? `<p class="muted small">Nu ai adăugat încă niciun test.</p>` : ''}
+    ${tests.map(t => `
+      <div class="admin-test-item" data-id="${t.id}">
+        <div class="row2">
+          <span class="badge" style="color:var(--${t.grade===4?'grade4':'grade8'})">Clasa a ${t.grade===4?'IV':'VIII'}-a</span>
+          <label class="small" style="margin-left:auto; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" class="et-published" ${t.published!==false?'checked':''}> Publicat
+          </label>
+        </div>
+        <input class="field et-title" style="margin-top:10px; font-weight:600;" value="${esc(t.title)}">
+        <input class="field et-desc" style="margin-top:8px;" value="${esc(t.description||'')}" placeholder="Descriere">
+        <div class="row2">
+          <input class="field et-price" style="max-width:110px;" type="number" min="0" step="0.01" value="${esc(t.price)}">
+          <span class="small muted">lei</span>
+          <button class="btn btn-dark small et-save" style="margin-left:auto; padding:8px 14px;">Salvează</button>
+          <button class="btn btn-ghost small et-delete" style="padding:8px 14px; color:var(--pen); border-color:var(--pen);">Șterge</button>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderAdminRequests(){
+  const manualTool = `
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="font-size:16px; margin-bottom:6px;">Deblocare manuală</h3>
+      <p class="small muted" style="margin-bottom:12px;">
+        Folosește asta dacă un elev a plătit dar nu a completat formularul, sau dacă vrei
+        să deblochezi accesul direct, fără să aștepți o cerere.
+      </p>
+      <label class="label">Email elev</label>
+      <input class="field" id="mu-email" placeholder="nume@exemplu.ro">
+      <label class="label" style="margin-top:12px;">Test</label>
+      <select class="field" id="mu-test">
+        ${tests.map(t=>`<option value="${t.id}">${esc(t.title)} (clasa a ${t.grade===4?'IV':'VIII'}-a)</option>`).join('')}
+      </select>
+      <button class="btn btn-dark" id="mu-unlock" style="margin-top:14px;">Deblochează acces</button>
+    </div>
+  `;
+
+  if(requests.length===0) return manualTool + `<p class="muted small">Nu sunt încă cereri de plată.</p>`;
+  const sorted = [...requests].sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+  return manualTool + sorted.map(r => `
+    <div class="pending-item ${r.status}" data-id="${r.id}">
+      <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <div>
+          <p style="font-weight:600; margin:0;">${esc(r.testTitle)}</p>
+          <p class="small muted" style="margin:4px 0 0;">${esc(r.email)} ${r.name?'· '+esc(r.name):''}</p>
+          ${r.note ? `<p class="small muted" style="margin:4px 0 0;">Notă: ${esc(r.note)}</p>` : ''}
+          <p class="small muted" style="margin:4px 0 0;">${new Date(r.createdAt).toLocaleString('ro-RO')}</p>
+        </div>
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          ${r.status==='pending' ? `
+            <button class="btn btn-dark small req-confirm" style="padding:8px 14px;">Confirmă</button>
+            <button class="btn btn-ghost small req-reject" style="padding:8px 14px;">Respinge</button>
+          ` : `<span class="small mono" style="text-transform:uppercase;">${r.status==='confirmed'?'confirmat':'respins'}</span>`}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function attachAdminEvents(){
+  if(!adminAuthed){
+    const form = document.getElementById('admin-login-form');
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const val = document.getElementById('admin-pass').value;
+      if(val === settings.adminPassword){
+        adminAuthed = true;
+        render();
+      } else {
+        toast('Parolă greșită.');
+      }
+    });
+    return;
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      adminTab = btn.dataset.tab;
+      document.getElementById('admin-tab-content').innerHTML = renderAdminTab();
+      attachAdminTabEvents();
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  attachAdminTabEvents();
+}
+
+function attachAdminTabEvents(){
+  if(adminTab==='settings'){
+    document.getElementById('save-settings').addEventListener('click', async ()=>{
+      settings.motto = document.getElementById('s-motto').value;
+      settings.tagline = document.getElementById('s-tagline').value;
+      settings.correctionEmail = document.getElementById('s-email').value;
+      settings.correctionNote = document.getElementById('s-note').value;
+      settings.paymentMethod = document.getElementById('s-pmethod').value;
+      settings.paymentHandle = document.getElementById('s-phandle').value;
+      settings.paymentInstructions = document.getElementById('s-pinstr').value;
+      settings.adminPassword = document.getElementById('s-pass').value || settings.adminPassword;
+      await saveSettings();
+      toast('Salvat.');
+    });
+  }
+
+  if(adminTab==='tests'){
+    document.getElementById('add-test').addEventListener('click', async ()=>{
+      const title = document.getElementById('nt-title').value.trim();
+      if(!title){ toast('Titlul e obligatoriu.'); return; }
+      const newId = uid();
+      tests.unshift({
+        id: newId,
+        grade: Number(document.getElementById('nt-grade').value),
+        title,
+        description: document.getElementById('nt-desc').value.trim(),
+        price: Number(document.getElementById('nt-price').value) || 15,
+        published: true
+      });
+      await saveTests();
+      await setTestContent(
+        newId,
+        document.getElementById('nt-type').value,
+        document.getElementById('nt-content').value.trim()
+      );
+      document.getElementById('admin-tab-content').innerHTML = renderAdminTab();
+      attachAdminTabEvents();
+      toast('Test adăugat.');
+    });
+
+    document.querySelectorAll('.admin-test-item').forEach(item=>{
+      const id = item.dataset.id;
+      item.querySelector('.et-save').addEventListener('click', async ()=>{
+        const t = tests.find(x=>x.id===id);
+        t.title = item.querySelector('.et-title').value;
+        t.description = item.querySelector('.et-desc').value;
+        t.price = Number(item.querySelector('.et-price').value) || t.price;
+        t.published = item.querySelector('.et-published').checked;
+        await saveTests();
+        toast('Salvat.');
+      });
+      item.querySelector('.et-delete').addEventListener('click', async ()=>{
+        if(!confirm('Ștergi definitiv acest test?')) return;
+        tests = tests.filter(x=>x.id!==id);
+        await saveTests();
+        await deleteTestContent(id);
+        document.getElementById('admin-tab-content').innerHTML = renderAdminTab();
+        attachAdminTabEvents();
+        toast('Șters.');
+      });
+    });
+  }
+
+  if(adminTab==='requests'){
+    const muBtn = document.getElementById('mu-unlock');
+    if(muBtn) muBtn.addEventListener('click', async ()=>{
+      const email = document.getElementById('mu-email').value.trim().toLowerCase();
+      const testId = document.getElementById('mu-test').value;
+      if(!email){ toast('Introdu emailul elevului.'); return; }
+      if(!testId){ toast('Nu ai niciun test creat încă.'); return; }
+      unlocks[email+'::'+testId] = true;
+      await saveUnlocks();
+      toast('Acces deblocat pentru '+email);
+      document.getElementById('mu-email').value = '';
+    });
+
+    document.querySelectorAll('.pending-item').forEach(item=>{
+      const id = item.dataset.id;
+      const confirmBtn = item.querySelector('.req-confirm');
+      const rejectBtn = item.querySelector('.req-reject');
+      if(confirmBtn) confirmBtn.addEventListener('click', async ()=>{
+        const r = requests.find(x=>x.id===id);
+        r.status = 'confirmed';
+        unlocks[r.email+'::'+r.testId] = true;
+        await saveRequests();
+        await saveUnlocks();
+        document.getElementById('admin-tab-content').innerHTML = renderAdminTab();
+        attachAdminTabEvents();
+        toast('Acces deblocat pentru '+r.email);
+      });
+      if(rejectBtn) rejectBtn.addEventListener('click', async ()=>{
+        const r = requests.find(x=>x.id===id);
+        r.status = 'rejected';
+        await saveRequests();
+        document.getElementById('admin-tab-content').innerHTML = renderAdminTab();
+        attachAdminTabEvents();
+        toast('Cerere respinsă.');
+      });
+    });
+  }
+}
+
+/* ================= INIT ================= */
+loadAll().then(render).catch(err=>{
+  document.getElementById('app').innerHTML = '<div class="loading">Eroare la încărcare. Reîncarcă pagina.</div>';
+  console.error(err);
+});
+
+})();
+</script>
+</body>
+</html>
